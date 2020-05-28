@@ -1,8 +1,1 @@
-{
-	"o_usr":"o_usr",
-	"o_pwd":"o_pwd",
-	"o_server":"webmail.uic.edu.hk",
-	"s_usr":"s_usr",
-	"s_pwd":"s_pwd",
-	"interval":3
-}
+{"o_usr": "usr", "o_pwd": "pwd", "o_server": "webmail.uic.edu.hk", "s_usr": "s_usr", "s_pwd": "s_pwd", "max": 1442, "interval": 5}
