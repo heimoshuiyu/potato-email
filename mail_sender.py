@@ -82,5 +82,4 @@ if __name__ == '__main__':
         message = 'test'
         mail_sender.send(title, message)
 
-
-
+mail_sender = Mail_sender()
