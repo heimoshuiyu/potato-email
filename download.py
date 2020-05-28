@@ -33,16 +33,18 @@ class LoopRead:
 # 读取邮件信息
 class ReadMessage:
     def __init__(self, data):
+        self.title = ''
         self.data = data
         self.content_queue = queue.Queue()
+        self.Content = ''
         
         # 启动线程
         self.thread = threading.Thread(target=self.download, args=(), daemon=True)
         self.thread.start()
     
-                           
-    def return_info(self, msg, Content, indent=0):
-       title=''
+    # 解析邮件内容并返回标题、文本内容                       
+    def return_info(self, msg, indent=0):
+       # 初始化标题为空字符串
        if indent == 0:
            for header in ['From', 'To', 'Subject']:
                value = msg.get(header, '')
@@ -54,15 +56,15 @@ class ReadMessage:
                        name = self.decode_str(hdr)
                        value = u'%s <%s>' % (name, addr)
                print('%s%s: %s' % ('  ' * indent, header, value))
-               Content += '  '*indent + header + ': ' + value + '\n'
+               self.Content += '  '*indent + header + ': ' + value + '\n'
        if (msg.is_multipart()):
            parts = msg.get_payload()
            for n, part in enumerate(parts):
                print('%spart %s' % ('  ' * indent, n))
                print('%s--------------------' % ('  ' * indent))
-               Content += '  ' * indent + 'part ' + str(n) +'\n'
-               Content += '  ' * indent + '--------------------\n'
-               self.return_info(part, Content, indent + 1)
+               self.Content += '  ' * indent + 'part ' + str(n) +'\n'
+               self.Content += '  ' * indent + '--------------------\n'
+               self.return_info(part, indent + 1)
        else:
            content_type = msg.get_content_type()
            if content_type=='text/plain' or content_type=='text/html':
@@ -71,13 +73,12 @@ class ReadMessage:
                if charset:
                    content = content.decode(charset)
                print('%sText: %s' % ('  ' * indent, content + '...'))
-               Content += '  ' * indent + 'Text: ' + content + '.\n'
+               self.Content += '  ' * indent + 'Text: ' + content + '.\n'
                #return indent, content
            else:
                print('%sAttachment: %s' % ('  ' * indent, content_type))
-               Content += '  ' * indent + 'Attachment: ' + str(content_type) + '\n'
-               #return indent, content_type
-       return title, Content     
+               self.Content += '  ' * indent + 'Attachment: ' + str(content_type) + '\n'
+               #return indent, content_type     
 
     # 文本解码
     def decode_str(self, s):
@@ -98,7 +99,6 @@ class ReadMessage:
     
     # 读单封邮件并解析提取标题和内容
     def readMail(self, server, index=1):
-        Content=''
         resp, lines, octets = server.retr(index)
     
         # lines存储了邮件原始文本所有内容
@@ -108,10 +108,8 @@ class ReadMessage:
         msg = Parser().parsestr(msg_content)
         
         # 解析邮件
-        title, Content = self.return_info(msg, Content)
+        self.return_info(msg, Content)
         
-        # 返回标题和文本内容
-        return title, Content
     
     # 更新json
     def json_write(self):
@@ -140,19 +138,23 @@ class ReadMessage:
             self.data["max"] = index
             self.json_write(self.data)
         else:
-            title, Content = self.readMail(server)
+            self.readMail(server)
         
         
         # 关闭连接
         server.quit()
         
-        return title, Content
+        # 返回标题和文本内容
+        return self.title, self.Content
     
     # 读邮件（无阻塞）
     def read(self):
         title, Content = self.download()
         lr = LoopRead(self.data)
         lr.content_queue.put(Content)
+        
+        # 返回标题和文本内容
+        return self.title, self.Content
         
 if __name__ == '__main__':
     try:
