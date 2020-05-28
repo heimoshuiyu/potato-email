@@ -156,12 +156,18 @@ class ReadMessage:
         
 if __name__ == '__main__':
     try:
+        # 读取基本信息
         data = readInfo("./Info.json")
+        
+        # 进行邮件分析
         r = ReadMessage(data)
         title, Content = r.read()
+        
+        # 如果正常读取，则设置状态为0（正常），并覆盖之前的状态码
         data["state"] = 0
         r.json_write()
     except:
+        # 邮件读取失败，状态码显示异常，每次加1；连续2小时出问题，则发一份警告
         if data["state"] < 32:
             data["state"] += 1
             r.json_write()
