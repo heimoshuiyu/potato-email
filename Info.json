@@ -1,7 +1,8 @@
 {
-	"o_usr":,
-	"o_pwd":,
-	"s_usr":,
-	"s_pwd":,
-	"interval":,
+	"o_usr":"o_usr",
+	"o_pwd":"o_pwd",
+	"o_server":"webmail.uic.edu.hk",
+	"s_usr":"s_usr",
+	"s_pwd":"s_pwd",
+	"interval":3
 }
