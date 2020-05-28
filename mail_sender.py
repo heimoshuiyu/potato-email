@@ -5,7 +5,11 @@
 #   # 无阻塞发送邮件方法，传入标题和内容
 #   def send(self, title='Title', content='Text')
 #
-#   
+# 示例
+# from mail_sender import mail_sender
+# mail_sender.send(title='I am title', content='I am content')
+# 或者
+# mail_sender.send('I am title', 'I am content')
 # 
 
 import smtplib
