@@ -3,6 +3,7 @@ from LFP import readInfo
 from email.parser import Parser
 from email.utils import parseaddr
 from email.header import decode_header
+from mail_sender import mail_sender.send
 
 def return_info(msg, Content, indent=0):
        title=''
@@ -76,6 +77,14 @@ def readMail(server, index=1):
     # 返回标题和文本内容
     return title, Content
 
+# 更新json
+def json_write(data):
+    json_str = json.dumps(data)
+    new = open("Info.json", "w+", encoding="utf-8")
+    new.write(json_str)
+    new.close()
+
+
 # 下载邮件
 def download(data):
     # 连接到pop服务器
@@ -92,10 +101,7 @@ def download(data):
     index = len(mails) # index是最大邮件数
     if data["max"]>index:
         data["max"] = index
-        json_str = json.dumps(data)
-        new = open("Info.json", "w+", encoding="utf-8")
-        new.write(json_str)
-        new.close()
+        json_write(data)
     else:
         title, Content = readMail(server)
     
@@ -106,7 +112,20 @@ def download(data):
     return title, Content
         
 if __name__ == '__main__':
-    title, content = download(readInfo("./Info.json"))
+    try:
+        data = readInfo("./Info.json")
+        title, content = download(data)
+        data["state"] = 0
+        json_write(data)
+    except:
+        if data["state"] < 32:
+            data["state"] += 1
+            json_write(data)
+        elif data["state"] = 33:
+            send("Warning! Your assistance meet a problem!", "My dear master,\n\t I've got into a huge trouble! I need your help!\n\n\n\t Your lovely Potato Assistant (^_^).")
+        else:
+            pass
+        
     input(content)
 
 
