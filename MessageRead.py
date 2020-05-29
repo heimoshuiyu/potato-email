@@ -1,6 +1,5 @@
 import poplib, json, queue, time, mail_sender
 from config import data, kwd
-# from LFP import readInfo
 from re import sub
 from email.parser import Parser
 from email.utils import parseaddr
@@ -8,6 +7,27 @@ from email.header import decode_header
 from slog import logger
 
 
+############################## 这个类自带了日志功能，会记录下所有的错误 ##########################
+
+################################  在其他文件里使用这个函数的例子  ####################################
+#
+# import MessageRead
+# from config import data, kwd
+# 
+# r = ReadMessage(data)
+# 
+# （成功则更新json文件）
+# data["state"] = 0
+# r.json_write()
+# content_lst = r.read()
+#
+# 这里的content_lst就是你要的内容列表辣！！
+#
+#
+#
+#
+#
+#
 ######################################## 这是整理过思路后的新解法 ########################################
 
 class ReadMessage:
@@ -149,6 +169,8 @@ class ReadMessage:
     
     # 循环读取新的未读邮件
     def read(self):
+        logger('本次启动时间为: %s' % (str(time.asctime( time.localtime(time.time()) ))),path="./log/")
+        print('1')
         server = self.Connect()
         
         # 判断未读邮件队列是否为空，看是否有新的未读邮件

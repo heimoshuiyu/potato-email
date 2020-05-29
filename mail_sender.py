@@ -22,9 +22,9 @@ import config
 
 class Mail_sender:
     def __init__(self):
-        self.mail_host = config.jsondata.get('o_host')
-        self.mail_user = config.jsondata.get('o_usr')
-        self.mail_pass = config.jsondata.get('o_pwd')
+        self.mail_host = config.data.get('o_host')
+        self.mail_user = config.data.get('o_usr')
+        self.mail_pass = config.data.get('o_pwd')
         self.send_queue = queue.Queue()
         self.smtpobj = None
 
@@ -48,7 +48,7 @@ class Mail_sender:
                 self.send_queue.put(mail) # 失败的邮件重新放回发送队列
                 time.sleep(10) # todo: 从json中读取发生错误尝试重复发送的时间间隔
             finally:
-                time.sleep(5） # todo: 从接送中读取发送邮件的时间间隔
+                time.sleep(5) # todo: 从接送中读取发送邮件的时间间隔
             
 
     # 初始化并登录smtp服务器

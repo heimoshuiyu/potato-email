@@ -1,6 +1,6 @@
 import os, time
 
-def logger(info, do = 1, path='d:/spider_debug/', file = str(time.strftime("%Y%m%d_%H%M%S", time.localtime()))+'.txt'):
+def logger(info, do = 1, path='d:/spider_debug/', file = str(time.strftime("%Y%m%d", time.localtime()))+'.txt'):
     if path[-1] != '/' or '\\':
         path = path+'/'
     logfile = path+file
