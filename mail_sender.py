@@ -18,12 +18,13 @@ import threading
 import time
 import email
 import email.mime.text
+import config
 
 class Mail_sender:
     def __init__(self):
-        self.mail_host = 'webmail.uic.edu.hk'
-        self.mail_user = 'p930006025@mail.uic.edu.hk'
-        self.mail_pass = 'enter your password here~~~~'
+        self.mail_host = config.jsondata.get('o_host')
+        self.mail_user = config.jsondata.get('o_usr')
+        self.mail_pass = config.jsondata.get('o_pwd')
         self.send_queue = queue.Queue()
         self.smtpobj = None
 
@@ -86,4 +87,5 @@ if __name__ == '__main__':
         message = 'test'
         mail_sender.send(title, message)
 
+# 实例化Mail_sender，供外部调用
 mail_sender = Mail_sender()
