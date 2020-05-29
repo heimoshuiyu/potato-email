@@ -11,7 +11,7 @@ from slog import logger
 
 ################################  在其他文件里使用这个函数的例子  ####################################
 #
-# import MessageRead
+# from MessageRead import ReadMessage
 # from config import data, kwd
 # 
 # r = ReadMessage(data)
