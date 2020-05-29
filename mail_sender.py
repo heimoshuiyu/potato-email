@@ -5,7 +5,11 @@
 #   # 无阻塞发送邮件方法，传入标题和内容
 #   def send(self, title='Title', content='Text')
 #
-#   
+# 示例
+# from mail_sender import mail_sender
+# mail_sender.send(title='I am title', content='I am content')
+# 或者
+# mail_sender.send('I am title', 'I am content')
 # 
 
 import smtplib
@@ -14,12 +18,13 @@ import threading
 import time
 import email
 import email.mime.text
+import config
 
 class Mail_sender:
     def __init__(self):
-        self.mail_host = 'webmail.uic.edu.hk'
-        self.mail_user = 'p930006025@mail.uic.edu.hk'
-        self.mail_pass = 'enter your password here~~~~'
+        self.mail_host = config.jsondata.get('o_host')
+        self.mail_user = config.jsondata.get('o_usr')
+        self.mail_pass = config.jsondata.get('o_pwd')
         self.send_queue = queue.Queue()
         self.smtpobj = None
 
@@ -82,5 +87,5 @@ if __name__ == '__main__':
         message = 'test'
         mail_sender.send(title, message)
 
-
-
+# 实例化Mail_sender，供外部调用
+mail_sender = Mail_sender()
