@@ -6,13 +6,13 @@
 # import config
 #
 # 读取操作字典
-# print(config.jsondata['key'])
+# print(config.data['key'])
 # 
 # 读取关键词列表
 # print(config.ksd)
 #
 # 设置字典键值对
-# config.jsondata['key'] = value
+# config.data['key'] = value
 #
 # 保存字典到json
 # config.save_json()
@@ -26,21 +26,21 @@ import json
 JSON_FILENAME = 'Info.json'
 KWD_FILENAME = 'kwd.txt'
 
-with open(JSON_FILENAME, 'r') as f:
-    jsondata = json.loads(f.read())
+with open(JSON_FILENAME, 'r', encoding='utf-8') as f:
+    data = json.loads(f.read())
 
-with open(KWD_FILENAME, 'r') as f:
+with open(KWD_FILENAME, 'r', encoding='utf-8') as f:
     __kwd_str = f.read()
 __kwd_str = __kwd_str.replace('\r', '')
 kwd = __kwd_str.split('\n')
 
 
 def save_json():
-    with open(JSON_FILENAME, 'w') as f:
-        f.write(json.dumps(jsondata))
+    with open(JSON_FILENAME, 'w', encoding='utf-8') as f:
+        f.write(json.dumps(data))
 
 def save_kwd():
-    with open(KWD_FILENAME, 'w') as f:
+    with open(KWD_FILENAME, 'w', encoding='utf-8') as f:
         __kwd_str = '\n'.join(kwd)
         f.write(__kwd_str)
 
