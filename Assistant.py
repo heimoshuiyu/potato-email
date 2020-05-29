@@ -19,7 +19,7 @@ if __name__ == "__main__":
         
         # 用循环取出列表里的内容发送
         for content in content_lst:
-            mail_sender.send(content[0], content[1])
+            mail_sender.mail_sender.send(content[0], content[1])
         
         # 设置间隔时间
         time.sleep(60 * data["interval"])

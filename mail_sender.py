@@ -22,9 +22,9 @@ import config
 
 class Mail_sender:
     def __init__(self):
-        self.mail_host = config.data.get('o_host')
-        self.mail_user = config.data.get('o_usr')
-        self.mail_pass = config.data.get('o_pwd')
+        self.mail_host = config.data.get('s_host')
+        self.mail_user = config.data.get('s_usr')
+        self.mail_pass = config.data.get('s_pwd')
         self.send_queue = queue.Queue()
         self.smtpobj = None
 
@@ -53,14 +53,14 @@ class Mail_sender:
 
     # 初始化并登录smtp服务器
     def init_and_send(self, mail):
-        print('start sending') # todo 记录日志
+        print('\nstart sending') # todo 记录日志
         self.smtpobj = smtplib.SMTP()
         self.smtpobj.connect(self.mail_host, 25)
         self.smtpobj.login(self.mail_user, self.mail_pass)
-        print('init over')
+        print('\ninit over')
 
         self.smtpobj.sendmail(self.mail_user, self.mail_user, self.to_string(mail))
-        print('send over')
+        print('\nsend over')
 
     # 将Mail结构转化成SMTP协议可以读取的字符串结构
     def to_string(self, mail):
@@ -83,7 +83,8 @@ if __name__ == '__main__':
     mail_sender = Mail_sender()
 
     while True:
-        title = input('仅供测试用，请输入标题')
+        title = input('仅供测试用，请输入标题\n')
+        print(config.data['s_host'])
         message = 'test'
         mail_sender.send(title, message)
 
