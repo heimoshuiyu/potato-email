@@ -1,13 +1,16 @@
 import poplib, json, queue, time, mail_sender
 from config import data, kwd, save_json
-from re import sub
+from re import sub, search, compile
 from email.parser import Parser
 from email.utils import parseaddr
 from email.header import decode_header
 from slog import logger
 
 
-############################## 这个类自带了日志功能，会记录下所有的错误 ##########################
+############################## 功能介绍 ##########################
+
+# 这个类自带了日志功能，会记录下所有的错误
+# 有[1:精确查找  2:模糊查找  3:联合+精确查找  4:联合+模糊查找]的功能 (联合查找用++分隔)
 
 ################################  在其他文件里使用这个函数的例子  ####################################
 #
@@ -168,6 +171,71 @@ class ReadMessage:
                 charset = content_type[pos + 8:].strip()
         return charset
     
+    # 模糊查找算法
+    def fuzzy_search(self, word):
+        co_in = []
+        new_ls = [i for i in word]
+        
+        # 省略2个以内字符的模糊查找
+        # pt1 = compile('.{1}')
+        # new1 = '.{0,2}'.join(pt1.findall(word))
+        # co_in.append(search(new1, self.search))
+        
+        # 打错2个或省略1个字符的模糊查找
+        new2 = []
+        for i in range(len(new_ls)):
+            ch = new_ls[i]
+            new_ls[i] = '.{2}'
+            new2.append(''.join(new_ls))
+            new_ls[i] = ch
+        for i in new2:
+            if search(i, self.search) != None:
+                co_in.append(True)
+        
+        # 若有匹配项目,则返回真
+        if True in co_in:
+            return True
+        else:
+            return False
+    
+    # 查词模式[1:精确查找  2:模糊查找  3:联合+精确查找  4:联合+模糊查找]
+    def search_wd(self, word):
+        # 精确查找
+        if self.data["mode"] == 1:
+            return (word in self.search)
+        
+        # 模糊查找
+        elif self.data["mode"] == 2:
+            return fuzzy_search(word)
+            
+        # 联合+精确查找
+        elif self.data["mode"] == 3:
+            try:
+                w_ls = word.split("++")
+            except:
+                w_ls = word
+            co_in = []
+            for i in w_ls:
+                co_in.append(i in self.search)
+            if False in co_in:
+                return False
+            else:
+                return True
+        
+        # 联合+模糊查找
+        elif self.data["mode"] == 4:
+            try:
+                w_ls = word.split("++")
+            except:
+                w_ls = word
+            co_in = []
+            for i in w_ls:
+                co_in.append(fuzzy_search(i))
+            if False in co_in:
+                return False
+            else:
+                return True
+    
     # 循环读取新的未读邮件
     def read(self):
         logger('本次启动时间为: %s' % (str(time.asctime( time.localtime(time.time()) ))),path="./log/")
@@ -182,7 +250,7 @@ class ReadMessage:
                 print(newMail)
                 self.download(server, newMail)
                 for i in kwd:
-                    if i in self.search: # 若文本或标题出现关键词，将内容放入待发送队列
+                    if search_wd(i): # 若文本或标题出现关键词，将内容放入待发送队列
                         self.mail_queue.append((self.title, self.Content))
                 self.clean() # 每次读完一封邮件就把内容和标题清掉
                 isEmpty = self.newMail.empty()
