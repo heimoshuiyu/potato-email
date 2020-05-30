@@ -11,6 +11,7 @@ from slog import logger
 
 # 这个类自带了日志功能，会记录下所有的错误
 # 有[1:精确查找  2:模糊查找  3:联合+精确查找  4:联合+模糊查找]的功能 (联合查找用++分隔)
+# 注意!模糊查找的速度会变慢！
 
 ################################  在其他文件里使用这个函数的例子  ####################################
 #
@@ -183,9 +184,15 @@ class ReadMessage:
         
         # 打错2个或省略1个字符的模糊查找
         new2 = []
+        if len(new_ls) == 1:
+            if word in self.search:
+                return True
+            else:
+                return False
+                
         for i in range(len(new_ls)):
             ch = new_ls[i]
-            new_ls[i] = '.{2}'
+            new_ls[i] = '.{0,2}'
             new2.append(''.join(new_ls))
             new_ls[i] = ch
         for i in new2:
@@ -206,7 +213,7 @@ class ReadMessage:
         
         # 模糊查找
         elif self.data["mode"] == 2:
-            return fuzzy_search(word)
+            return self.fuzzy_search(word)
             
         # 联合+精确查找
         elif self.data["mode"] == 3:
@@ -223,23 +230,24 @@ class ReadMessage:
                 return True
         
         # 联合+模糊查找
-        elif self.data["mode"] == 4:
+        else:
             try:
                 w_ls = word.split("++")
             except:
                 w_ls = word
             co_in = []
             for i in w_ls:
-                co_in.append(fuzzy_search(i))
+                co_in.append(self.fuzzy_search(i))
             if False in co_in:
                 return False
             else:
                 return True
+        
     
     # 循环读取新的未读邮件
     def read(self):
         logger('本次启动时间为: %s' % (str(time.asctime( time.localtime(time.time()) ))),path="./log/")
-        print('1')
+        print('Start reading')
         server = self.Connect()
         
         # 判断未读邮件队列是否为空，看是否有新的未读邮件
@@ -250,7 +258,8 @@ class ReadMessage:
                 print(newMail)
                 self.download(server, newMail)
                 for i in kwd:
-                    if search_wd(i): # 若文本或标题出现关键词，将内容放入待发送队列
+                    print(i)
+                    if self.search_wd(i) and (self.title, self.Content) not in self.mail_queue: # 若文本或标题出现关键词，将内容放入待发送队列
                         self.mail_queue.append((self.title, self.Content))
                 self.clean() # 每次读完一封邮件就把内容和标题清掉
                 isEmpty = self.newMail.empty()
