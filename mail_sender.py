@@ -54,8 +54,9 @@ class Mail_sender:
     # 初始化并登录smtp服务器
     def init_and_send(self, mail):
         print('\nstart sending') # todo 记录日志
-        self.smtpobj = smtplib.SMTP()
-        self.smtpobj.connect(self.mail_host, 25)
+        self.smtpobj = smtplib.SMTP(self.mail_host, 587)
+        self.smtpobj.starttls()
+        print('\nconnect sucess')
         self.smtpobj.login(self.mail_user, self.mail_pass)
         print('\ninit over')
 
