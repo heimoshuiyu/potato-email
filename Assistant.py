@@ -1,11 +1,16 @@
 import mail_sender, time, os, slog
-from config import data, kwd
+from config import data, kwd, save_json
 from MessageRead import ReadMessage
 
 ################## 这个作为整合的主函数使用 ################
 
 def main():
     while 1:
+        # 此处写你的敏感信息
+        data["o_usr"]=""
+        data["o_pwd"]=""
+        data["s_usr"]=""
+        data["s_pwd"]=""
         # 心跳功能，防止程序死的悄无声息
         if os.path.exists(u"./log/%s.txt" % (str(time.strftime("%Y%m%d", time.localtime())))):
             pass
@@ -17,7 +22,7 @@ def main():
 
             #（成功则更新json文件）
             data["state"] = 0
-            r.json_write()
+            save_json()
             content_lst = r.read()
         
         except:
@@ -28,6 +33,8 @@ def main():
             mail_sender.mail_sender.send(content[0], content[1])
         
         # 设置间隔时间
+        r.clean_dic()
+        save_json()
         time.sleep(60 * data["interval"])
 
 

@@ -74,8 +74,10 @@ class Mail_sender:
         
         self.smtpobj.login(self.mail_user, self.mail_pass)
         print('\ninit over')
+        print('\n%s' % ('**'*20))
 
     def send_one_mail(self, mail):
+        print('\n%s' % ('**'*20))
         print('\nstart sending')
         self.smtpobj.sendmail(self.mail_user, self.mail_user, self.to_string(mail))
         print('\nsend over')

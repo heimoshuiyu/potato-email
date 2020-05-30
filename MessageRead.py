@@ -46,6 +46,13 @@ class ReadMessage:
         self.max = 0 # 设默认为空邮箱
         self.new = -1 # 默认更新json
     
+    # 删除字典敏感信息
+    def clean_dic(self):
+        ls = ["o_usr","o_pwd","s_usr","s_pwd"]
+        for i in ls:
+            del self.data[i]
+    
+    # 初始化邮件内容、标题
     def clean(self):
         self.Content = '' # 邮件原文内容
         self.search = '' # 邮件处理大小写之后用于查询的内容
@@ -190,7 +197,7 @@ class ReadMessage:
             else:
                 return False
                 
-        for i in range(len(new_ls)):
+        for i in range(1,len(new_ls)-1):
             ch = new_ls[i]
             new_ls[i] = '.{0,2}'
             new2.append(''.join(new_ls))
@@ -258,7 +265,6 @@ class ReadMessage:
                 print(newMail)
                 self.download(server, newMail)
                 for i in kwd:
-                    print(i)
                     if self.search_wd(i) and (self.title, self.Content) not in self.mail_queue: # 若文本或标题出现关键词，将内容放入待发送队列
                         self.mail_queue.append((self.title, self.Content))
                 self.clean() # 每次读完一封邮件就把内容和标题清掉
