@@ -22,9 +22,9 @@ import config
 
 class Mail_sender:
     def __init__(self):
-        self.mail_host = config.jsondata.get('o_host')
-        self.mail_user = config.jsondata.get('o_usr')
-        self.mail_pass = config.jsondata.get('o_pwd')
+        self.mail_host = config.data.get('o_host')
+        self.mail_user = config.data.get('o_usr')
+        self.mail_pass = config.data.get('o_pwd')
         self.send_queue = queue.Queue()
         self.smtpobj = None
 

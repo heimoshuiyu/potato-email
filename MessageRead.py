@@ -1,5 +1,5 @@
 import poplib, json, queue, time, mail_sender
-from config import data, kwd
+from config import data, kwd, save_json
 # from LFP import readInfo
 from re import sub
 from email.parser import Parser
@@ -200,7 +200,7 @@ if __name__ == "__main__":
         
         # 成功则更新json文件
         data["state"] = 0
-        r.json_write()
+        save_json()
         content_lst = r.read()
         
         # 打印出匹配到的第一则邮件
