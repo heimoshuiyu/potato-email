@@ -4,7 +4,7 @@ from MessageRead import ReadMessage
 
 ################## 这个作为整合的主函数使用 ################
 
-if __name__ == "__main__":
+def main():
     while 1:
         try:
             r = ReadMessage(data)
@@ -23,3 +23,7 @@ if __name__ == "__main__":
         
         # 设置间隔时间
         time.sleep(60 * data["interval"])
+
+if __name__ == '__main__':
+    main()
+
