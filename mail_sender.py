@@ -27,6 +27,7 @@ class Mail_sender:
         self.mail_pass = config.data.get('s_pwd')
         self.send_queue = queue.Queue()
         self.smtpobj = None
+        self.try_init_smtp() # 初始化smtp，如果失败会不断重试
 
         # 启动发送邮件线程
         self.thread = threading.Thread(target=self.send_thread, args=(), daemon=True)
@@ -42,9 +43,13 @@ class Mail_sender:
         while True:
             mail = self.send_queue.get()
             try:
-                self.init_and_send(mail)
+                self.send_one_mail(mail) # 发送一封邮件
             except Exception as e:
                 print('发生错误%s: %s' % (type(e), str(e)))
+
+                # 有可能因为等待时间过长，smtp连接自动关闭，所以要重新初始化smtp
+                self.try_init_smtp() 
+
                 self.send_queue.put(mail) # 失败的邮件重新放回发送队列
                 time.sleep(10) # todo: 从json中读取发生错误尝试重复发送的时间间隔
             finally:
@@ -52,15 +57,26 @@ class Mail_sender:
             
 
     # 初始化并登录smtp服务器
-    def init_and_send(self, mail):
+    def try_init_smtp(self):
+        while True:
+            try:
+                self.init_smtp() # 调用初始化函数
+                break # 如果初始化失败，会一直尝试初始化，直到成功
+            except Exception as e:
+                print('登录smtp时发生错误%s: %s' % (type(e), str(e)))
+                time.sleep(5)
+
+    def init_smtp(self):
         print('\n%s' % ('**'*20))
-        print('\nstart sending') # todo 记录日志
+        print('\nstart init') # todo 记录日志
         self.smtpobj = smtplib.SMTP()
         self.smtpobj.connect(self.mail_host, 587)
         
         self.smtpobj.login(self.mail_user, self.mail_pass)
         print('\ninit over')
 
+    def send_one_mail(self, mail):
+        print('\nstart sending')
         self.smtpobj.sendmail(self.mail_user, self.mail_user, self.to_string(mail))
         print('\nsend over')
         
