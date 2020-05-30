@@ -142,6 +142,7 @@ class ReadMessage:
                     content = content.decode(charset)
                     content = sub('<[^<>]+>','',content)
                     con = sub('.{0}  +.{0}','',content)
+                    con = sub('[\r\n]','',con)
                 # print('%sText: %s' % ('\t' * indent, content))
                 self.search += '\t'*indent + con
                 self.Content += u'%sText: %s\n' % ('\t'*indent, content)
