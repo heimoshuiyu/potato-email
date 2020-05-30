@@ -56,7 +56,7 @@ class Mail_sender:
         print('\n%s' % ('**'*20))
         print('\nstart sending') # todo 记录日志
         self.smtpobj = smtplib.SMTP()
-        self.smtpobj.connect(self.mail_host, 465)
+        self.smtpobj.connect(self.mail_host, 587)
         
         self.smtpobj.login(self.mail_user, self.mail_pass)
         print('\ninit over')
