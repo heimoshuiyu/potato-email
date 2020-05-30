@@ -247,7 +247,7 @@ class ReadMessage:
     # 循环读取新的未读邮件
     def read(self):
         logger('本次启动时间为: %s' % (str(time.asctime( time.localtime(time.time()) ))),path="./log/")
-        print('Start reading')
+        print('Start reading -- %s' % (str(time.asctime( time.localtime(time.time()) ))))
         server = self.Connect()
         
         # 判断未读邮件队列是否为空，看是否有新的未读邮件
@@ -301,6 +301,7 @@ if __name__ == "__main__":
         # 成功则更新json文件
         data["state"] = 0
         save_json()
+        content_lst = []
         content_lst = r.read()
         
         # 打印出匹配到的第一则邮件

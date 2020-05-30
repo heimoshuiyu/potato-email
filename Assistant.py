@@ -7,7 +7,7 @@ from MessageRead import ReadMessage
 def main():
     while 1:
         # 心跳功能，防止程序死的悄无声息
-        if os.path.exists(u"./log/%s" % (str(time.strftime("%Y%m%d", time.localtime())))):
+        if os.path.exists(u"./log/%s.txt" % (str(time.strftime("%Y%m%d", time.localtime())))):
             pass
         else:
             mail_sender.mail_sender.send("Dear Master, I am still alive! Take it easy.", "This is a Heartbeat function message. I'll send you every day so that you can know I'm there.")
