@@ -53,15 +53,18 @@ class Mail_sender:
 
     # 初始化并登录smtp服务器
     def init_and_send(self, mail):
+        print('\n%s' % ('**'*20))
         print('\nstart sending') # todo 记录日志
-        self.smtpobj = smtplib.SMTP(self.mail_host, 587)
-        self.smtpobj.starttls()
-        print('\nconnect sucess')
+        self.smtpobj = smtplib.SMTP()
+        self.smtpobj.connect(self.mail_host, 465)
+        
         self.smtpobj.login(self.mail_user, self.mail_pass)
         print('\ninit over')
 
         self.smtpobj.sendmail(self.mail_user, self.mail_user, self.to_string(mail))
         print('\nsend over')
+        
+        print('\n%s' % ('**'*20))
 
     # 将Mail结构转化成SMTP协议可以读取的字符串结构
     def to_string(self, mail):
