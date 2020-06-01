@@ -9,7 +9,8 @@ class Main:
     def __init__(self):
         self.newDay = 0
 
-    def heartBeat(self):
+    # 这里的beatTime是写在json里的数字，0~24，代表0~24小时
+    def heartBeat(self, beatTime):
         while 1:
             # 心跳功能，防止程序死的悄无声息
             now = time.localtime(time.time())
@@ -17,23 +18,21 @@ class Main:
                 pass
             else:
                 self.newDay = 1
-                logger('本次启动时间为: %s' % (str(time.asctime( time.localtime(time.time()) ))),path="./log/")
+                logger('本次心跳启动时间为: %s' % (str(time.asctime( time.localtime(time.time()) ))),path="./log/")
                 # 确保休眠到早上7点后再发心跳
-                if (7 - now[3]) >= 0:
-                    time.sleep(3600*(7-now[3]-1) + 60*(60-now[4]))
+                if (beatTime - now[3]) >= 0:
+                    time.sleep(3600*(beatTime-now[3]-1) + 60*(60-now[4]))
                 mail_sender.mail_sender.send("Dear Master, I am still alive! Take it easy.", "This is a Heartbeat function message. I'll send you every day so that you can know I'm there.")
                 self.newDay = 2
             time.sleep(5)
 
     def headBeatThread(self):
         while 1:
-            self.heartBeat()
+            logger('本次心跳启动时间为: %s' % (str(time.asctime( time.localtime(time.time()) ))),path="./log/")
+            mail_sender.mail_sender.send("Dear Master, I am still alive! Take it easy.", "This is a Heartbeat function message. I'll send you every day so that you can know I'm there.")
             time.sleep(60 * 60 * 24)
 
     def main(self):
-        thread = threading.Thread(target=self.heartBeatThread, args=(), daemon=True)
-        thread.start()
-
         while 1:
             # 此处写你的敏感信息
             data["o_usr"]=""
@@ -63,7 +62,13 @@ class Main:
 
 if __name__ == '__main__':
     m = Main()
-    thread = threading.Thread(target = m.heartBeat, args=(), daemon=True)
+    
+    # 若心跳模式为1，则24小时跳一次，时间取决于什么时候开始； 若为2， 则在自定义时间后才发心跳邮件
+    if data["heart"] == 1:
+        thread = threading.Thread(target = m.headBeatThread, args=(), daemon=True)
+    else:
+        beatTime = data["beatTime"]
+        thread = threading.Thread(target = m.heartBeat, args=(beatTime,), daemon=True)
     thread.start()
     m.main()
 

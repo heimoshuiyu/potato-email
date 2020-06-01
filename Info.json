@@ -1,1 +1,1 @@
-{"mode": 4, "o_server": "webmail.uic.edu.hk", "s_host": "smtp.qq.com", "max": 1463, "state": 0, "interval": 5}
+{"mode": 4, "beatTime": 7, "o_server": "webmail.uic.edu.hk", "s_host": "smtp.qq.com", "max": 1465, "state": 0, "interval": 5, "heart": 2}
