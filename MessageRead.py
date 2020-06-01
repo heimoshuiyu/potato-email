@@ -276,7 +276,7 @@ class ReadMessage:
                 self.json_write()
                 
             except Exception as e:
-                logger('发生错误%s: %s' % (type(e), str(e)),path="./log/")
+                logger(u'发生错误%s: %s' % (type(e), str(e)),path="./log/")
                 self.newMail.put(newMail) # 失败的邮件重新放回发送队列
                 
                 # 邮件读取失败，状态码显示异常，每次加1；连续2小时出问题，则发一份警告

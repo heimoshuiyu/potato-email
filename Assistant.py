@@ -1,8 +1,24 @@
-import mail_sender, time, os, slog
+import mail_sender, time, os, threading
+from slog import logger
 from config import data, kwd, save_json
 from MessageRead import ReadMessage
 
 ################## 这个作为整合的主函数使用 ################
+
+newDay = 0
+
+def heartBeat():
+    # 心跳功能，防止程序死的悄无声息
+    now = time.asctime( time.localtime(time.time()))
+    if os.path.exists(u"./log/%s.txt" % (str(time.strftime("%Y%m%d", time.localtime())))) or newDay == 2:
+        pass
+    else:
+        newDay = 1
+        logger(u'本次启动时间为: %s' % (str(time.asctime( time.localtime(time.time()) ))),path="./log/")
+        # 确保休眠到早上7点后再发心跳
+        if (7 - now[3]) >= 0:
+            time.sleep(3600*(7-now[3]-1) + 60*(60-now[4]))
+        mail_sender.mail_sender.send("Dear Master, I am still alive! Take it easy.", "This is a Heartbeat function message. I'll send you every day so that you can know I'm there.")
 
 def main():
     while 1:
@@ -11,12 +27,8 @@ def main():
         data["o_pwd"]=""
         data["s_usr"]=""
         data["s_pwd"]=""
-        # 心跳功能，防止程序死的悄无声息
-        if os.path.exists(u"./log/%s.txt" % (str(time.strftime("%Y%m%d", time.localtime())))):
-            pass
-        else:
-            mail_sender.mail_sender.send("Dear Master, I am still alive! Take it easy.", "This is a Heartbeat function message. I'll send you every day so that you can know I'm there.")
-            slog.logger('本次启动时间为: %s' % (str(time.asctime( time.localtime(time.time()) ))),path="./log/")
+        thread = threadig.Thread(target=heartBeat, args=(), daemon=True)
+        thread.start()
         try:
             r = ReadMessage(data)
 
