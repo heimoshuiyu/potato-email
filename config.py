@@ -34,6 +34,10 @@ with open(KWD_FILENAME, 'r', encoding='utf-8') as f:
 __kwd_str = __kwd_str.replace('\r', '')
 kwd = __kwd_str.split('\n')
 
+data["o_usr"]=""
+data["o_pwd"]=""
+data["s_usr"]=""
+data["s_pwd"]=""
 
 def save_json():
     with open(JSON_FILENAME, 'w', encoding='utf-8') as f:
