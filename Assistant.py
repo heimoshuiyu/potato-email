@@ -6,6 +6,9 @@ from MessageRead import ReadMessage
 ################## 这个作为整合的主函数使用 ################
 
 class Main:
+    def __init__(self):
+        self.newDay = 0
+
     def heartBeat(self):
         while 1:
             # 心跳功能，防止程序死的悄无声息
