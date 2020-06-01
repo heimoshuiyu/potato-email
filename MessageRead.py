@@ -267,7 +267,7 @@ class ReadMessage:
                 self.download(server, newMail)
                 for i in kwd:
                     if self.search_wd(i) and ((self.title, self.Content) not in self.mail_queue): # 若文本或标题出现关键词，将内容放入待发送队列
-                        print("%s's mail should be sent"%mail)
+                        print("%s's mail should be sent. Subject: %s"%(newMail, self.title))
                         self.mail_queue.append((self.title, self.Content))
                 self.clean() # 每次读完一封邮件就把内容和标题清掉
                 isEmpty = self.newMail.empty()
