@@ -80,7 +80,9 @@ class Mail_sender:
     def send_one_mail(self, mail):
         print('\n%s' % ('**'*20))
         print('\nstart sending')
-        logger(u'开始发送 %s' % (str(time.asctime( time.localtime(time.time()) ))),path="./log/")
+        logger('开始发送 %s' % (str(time.asctime( time.localtime(time.time()) ))),path="./log/")
+        if mail == '':
+            mail = 'No Content'
         self.smtpobj.sendmail(self.mail_user, self.mail_user, self.to_string(mail))
         print('\nsend over')
         

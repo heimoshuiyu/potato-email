@@ -30,7 +30,7 @@ with open(JSON_FILENAME, 'r', encoding='utf-8') as f:
     data = json.loads(f.read())
 
 with open(KWD_FILENAME, 'r', encoding='utf-8') as f:
-    __kwd_str = f.read()
+    __kwd_str = f.read().lower()
 __kwd_str = __kwd_str.replace('\r', '')
 kwd = __kwd_str.split('\n')
 

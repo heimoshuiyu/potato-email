@@ -10,11 +10,11 @@ newDay = 0
 def heartBeat():
     # 心跳功能，防止程序死的悄无声息
     now = time.asctime( time.localtime(time.time()))
-    if os.path.exists(u"./log/%s.txt" % (str(time.strftime("%Y%m%d", time.localtime())))) or newDay == 2:
+    if os.path.exists("./log/%s.txt" % (str(time.strftime("%Y%m%d", time.localtime())))) or newDay == 2:
         pass
     else:
         newDay = 1
-        logger(u'本次启动时间为: %s' % (str(time.asctime( time.localtime(time.time()) ))),path="./log/")
+        logger('本次启动时间为: %s' % (str(time.asctime( time.localtime(time.time()) ))),path="./log/")
         # 确保休眠到早上7点后再发心跳
         if (7 - now[3]) >= 0:
             time.sleep(3600*(7-now[3]-1) + 60*(60-now[4]))
