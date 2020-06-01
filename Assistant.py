@@ -11,7 +11,7 @@ class Main:
 
     def heartBeat(self):
         # 心跳功能，防止程序死的悄无声息
-        now = time.asctime( time.localtime(time.time()))
+        now = time.localtime(time.time())
         if os.path.exists("./log/%s.txt" % (str(time.strftime("%Y%m%d", time.localtime())))) or self.newDay == 2:
             pass
         else:
