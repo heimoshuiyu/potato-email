@@ -6,8 +6,6 @@ from MessageRead import ReadMessage
 ################## 这个作为整合的主函数使用 ################
 
 class Main:
-    def __init__(self):
-
     def heartBeat(self):
         # 心跳功能，防止程序死的悄无声息
         now = time.localtime(time.time())
