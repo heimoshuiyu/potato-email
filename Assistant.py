@@ -21,6 +21,7 @@ class Main:
             if (7 - now[3]) >= 0:
                 time.sleep(3600*(7-now[3]-1) + 60*(60-now[4]))
             mail_sender.mail_sender.send("Dear Master, I am still alive! Take it easy.", "This is a Heartbeat function message. I'll send you every day so that you can know I'm there.")
+            self.newDay = 2
 
     def main(self):
         while 1:
