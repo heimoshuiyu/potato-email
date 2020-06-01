@@ -122,6 +122,7 @@ class ReadMessage:
                    if header=='Subject':
                        # 提取标题
                        value = self.decode_str(value)
+                       v = value
                        self.title += value
                    else:
                        hdr, addr = parseaddr(value)
@@ -191,7 +192,7 @@ class ReadMessage:
         
         # 打错2个或省略1个字符的模糊查找
         new2 = []
-        if len(new_ls) == 1:
+        if len(new_ls) < 3:
             if word in self.search:
                 return True
             else:
@@ -265,7 +266,8 @@ class ReadMessage:
                 print(newMail)
                 self.download(server, newMail)
                 for i in kwd:
-                    if self.search_wd(i) and (self.title, self.Content) not in self.mail_queue: # 若文本或标题出现关键词，将内容放入待发送队列
+                    if self.search_wd(i) and ((self.title, self.Content) not in self.mail_queue): # 若文本或标题出现关键词，将内容放入待发送队列
+                        print("%s's mail should be sent"%mail)
                         self.mail_queue.append((self.title, self.Content))
                 self.clean() # 每次读完一封邮件就把内容和标题清掉
                 isEmpty = self.newMail.empty()
