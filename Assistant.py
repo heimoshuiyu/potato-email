@@ -10,18 +10,20 @@ class Main:
         self.newDay = 0
 
     def heartBeat(self):
-        # 心跳功能，防止程序死的悄无声息
-        now = time.localtime(time.time())
-        if os.path.exists("./log/%s.txt" % (str(time.strftime("%Y%m%d", time.localtime())))) or self.newDay == 2:
-            pass
-        else:
-            self.newDay = 1
-            logger('本次启动时间为: %s' % (str(time.asctime( time.localtime(time.time()) ))),path="./log/")
-            # 确保休眠到早上7点后再发心跳
-            if (7 - now[3]) >= 0:
-                time.sleep(3600*(7-now[3]-1) + 60*(60-now[4]))
-            mail_sender.mail_sender.send("Dear Master, I am still alive! Take it easy.", "This is a Heartbeat function message. I'll send you every day so that you can know I'm there.")
-            self.newDay = 2
+        while 1:
+            # 心跳功能，防止程序死的悄无声息
+            now = time.localtime(time.time())
+            if os.path.exists("./log/%s.txt" % (str(time.strftime("%Y%m%d", time.localtime())))) or self.newDay == 2:
+                pass
+            else:
+                self.newDay = 1
+                logger('本次启动时间为: %s' % (str(time.asctime( time.localtime(time.time()) ))),path="./log/")
+                # 确保休眠到早上7点后再发心跳
+                if (7 - now[3]) >= 0:
+                    time.sleep(3600*(7-now[3]-1) + 60*(60-now[4]))
+                mail_sender.mail_sender.send("Dear Master, I am still alive! Take it easy.", "This is a Heartbeat function message. I'll send you every day so that you can know I'm there.")
+                self.newDay = 2
+            time.sleep(5)
 
     def main(self):
         while 1:
@@ -30,8 +32,6 @@ class Main:
             data["o_pwd"]=""
             data["s_usr"]=""
             data["s_pwd"]=""
-            thread = threading.Thread(target=self.heartBeat, args=(), daemon=True)
-            thread.start()
             try:
                 r = ReadMessage(data)
 
@@ -54,6 +54,9 @@ class Main:
 
 
 if __name__ == '__main__':
-    Main().main()
+    m = Main()
+    thread = threading.Thread(target = m.heartBeat, args=(), daemon=True)
+    thread.start()
+    m.main()
 
 
