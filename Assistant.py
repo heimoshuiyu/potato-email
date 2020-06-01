@@ -6,9 +6,6 @@ from MessageRead import ReadMessage
 ################## 这个作为整合的主函数使用 ################
 
 class Main:
-    def __init__(self):
-        self.newDay = 0
-
     def heartBeat(self):
         while 1:
             # 心跳功能，防止程序死的悄无声息
@@ -25,7 +22,15 @@ class Main:
                 self.newDay = 2
             time.sleep(5)
 
+    def headBeatThread(self):
+        while 1:
+            self.heartBeat()
+            time.sleep(60 * 60 * 24)
+
     def main(self):
+        thread = threading.Thread(target=self.heartBeatThread, args=(), daemon=True)
+        thread.start()
+
         while 1:
             # 此处写你的敏感信息
             data["o_usr"]=""
