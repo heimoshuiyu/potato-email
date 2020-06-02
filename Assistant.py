@@ -24,6 +24,8 @@ class Main:
                     time.sleep(3600*(beatTime-now[3]-1) + 60*(60-now[4]))
                 mail_sender.mail_sender.send("Dear Master, I am still alive! Take it easy.", "This is a Heartbeat function message. I'll send you every day so that you can know I'm there.")
                 self.newDay = 2
+            if now[3] > 4 and now[3] < 7:
+                self.newDay = 0
             time.sleep(5)
 
     def headBeatThread(self):
