@@ -66,7 +66,11 @@ class Mail_sender:
             except Exception as e:
                 print('登录smtp时发生错误%s: %s' % (type(e), str(e)))
                 time.sleep(5)
-
+                if str(e)== 'Connection unexpectedly closed':
+                    print("** 连接太过频繁，服务器拒绝连接。30min后自动重试 **")
+                    # 连接太过频繁，30min后重试
+                    time.sleep(60*30)
+                
     def init_smtp(self):
         print('\n%s' % ('**'*20))
         print('\nstart init') # todo 记录日志
