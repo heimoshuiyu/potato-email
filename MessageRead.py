@@ -10,7 +10,8 @@ from slog import logger
 ############################## 功能介绍 ##########################
 
 # 这个类自带了日志功能，会记录下所有的错误
-# 有[1:精确查找  2:模糊查找  3:联合+精确查找  4:联合+模糊查找]的功能 (联合查找用++分隔追加条件，用(-你的条件-)的格式写你要减掉的条件并放在最后(不需要用空格隔开))
+# 有[1:精确查找  2:模糊查找  3:联合+精确查找  4:联合+模糊查找]的功能 (联合查找用++分隔追加条件，用(你的条件)的格式写你要减掉的条件并放在最后(不需要用空格隔开))
+# 可以在一行的最前面加**，可以单行进行精确搜索（实现全局上的精确/模糊/联合搜索）
 # 注意!模糊查找的速度会变慢！
 
 ################################  在其他文件里使用这个函数的例子  ####################################
@@ -192,8 +193,11 @@ class ReadMessage:
         
         # 打错2个或省略1个字符的模糊查找
         new2 = []
+        if len(new_ls) < 1:
+            return False
         if len(new_ls) < 3:
             if word in self.search:
+                print("匹配词为：%s;" % word)
                 return True
             else:
                 return False
@@ -203,19 +207,24 @@ class ReadMessage:
             new_ls[i] = "[^' '.]{0,2}"
             new2.append(''.join(new_ls))
             new_ls[i] = ch
+
         for i in new2:
             if search(i, self.search) != None:
                 # print("匹配词为：%s;  匹配项为：%s" % (word, i)) ### 调试用语句
                 co_in.append(True)
-        
+            else:
+                co_in.append(False)
         # 若有匹配项目,则返回真
         if True in co_in:
+            print("匹配词为：%s;" % word)
             return True
         else:
             return False
     
     # 查词模式[1:精确查找  2:模糊查找  3:联合+精确查找  4:联合+模糊查找]
     def search_wd(self, word):
+        if len(word) == 0:
+            return False
         # 精确查找
         if self.data["mode"] == 1:
             return (word in self.search)
@@ -244,9 +253,18 @@ class ReadMessage:
                 w_pls = word
             co_in = []
             for i in w_pls:
+                if len(i) == 0:
+                    return False
                 co_in.append(i in self.search)
             for i in w_sls:
+                if len(i) == 0:
+                    return True
                 co_in.append(not i in self.search)
+            try:
+                for i in w_sls:
+                    co_in.append(not i in self.search)
+            except:
+                pass
             if False in co_in:
                 return False
             else:
@@ -254,6 +272,7 @@ class ReadMessage:
         
         # 联合+模糊查找
         else:
+            
             try:
                 try:
                     w_pls = word.split("(")[0]
@@ -273,8 +292,11 @@ class ReadMessage:
             co_in = []
             for i in w_pls:
                 co_in.append(self.fuzzy_search(i))
-            for i in w_sls:
-                co_in.append(not self.fuzzy_search(i))
+            try:
+                for i in w_sls:
+                    co_in.append(not self.fuzzy_search(i))
+            except:
+                pass
             if False in co_in:
                 # print("一票否决")
                 return False
@@ -284,8 +306,8 @@ class ReadMessage:
     
     # 循环读取新的未读邮件
     def read(self):
-        logger('本次启动时间为: %s' % (str(time.asctime( time.localtime(time.time()) ))),path="./log/")
-        print('Start reading -- %s' % (str(time.asctime( time.localtime(time.time()) ))))
+        logger('本次启动时间为: %s' % (str(time.asctime( time.localtime(time.time())))),path="./log/")
+        print('Start reading -- %s' % (str(time.asctime( time.localtime(time.time())))))
         server = self.Connect()
         
         # 判断未读邮件队列是否为空，看是否有新的未读邮件
@@ -295,13 +317,28 @@ class ReadMessage:
                 newMail = self.newMail.get()
                 print(newMail)
                 self.download(server, newMail)
+                mode = self.data["mode"]
                 for i in kwd:
-                    if self.search_wd(i) and (not (self.title, self.Content) in self.mail_queue): # 若文本或标题出现关键词，将内容放入待发送队列
+                    if "**" in i:
+                        self.data["mode"] = 3  
+                    
+                    if "(" in i:
+                        try:
+                            subword = i.split("(")
+                            if subword[0] == '':
+                                subword[1] = subword[1].replace(")","")
+                            print("%s-%s-%s"%(subword,"##"*25,str(subword in self.search)))
+                            if subword[1] in self.search:
+                                break
+                        except:
+                            pass
+                    if self.search_wd(i): # 若文本或标题出现关键词，将内容放入待发送队列
                         print("%s's mail should be sent. Subject: %s"%(newMail, self.title))
                         self.mail_queue.append((self.title, self.Content))
                         break
                 self.clean() # 每次读完一封邮件就把内容和标题清掉
                 isEmpty = self.newMail.empty()
+                data["mode"] = mode # 把搜索模式设置回去
                 
                 # 如果正常读取，则设置状态为0（正常），并覆盖之前的状态码
                 data["state"] = 0
@@ -328,7 +365,7 @@ class ReadMessage:
             print("\tNone")
         for i in self.mail_queue:
             print(i[0])
-        print("\n\t%s"% "***"*15)
+        print("\n\t%s"% ("***"*20))
         # 返回一个待发送邮件列表
         return self.mail_queue      
 
@@ -351,9 +388,7 @@ if __name__ == "__main__":
         content_lst = r.read()
         
         # 打印出匹配到的第一则邮件
-        print("\n\t%s  下面是会被发送的邮件：  %s\n" % ("**"*10, "**"*10))
-        for i in content_lst:
-            print(i[0])
+        print(content_lst[0][1])
         input()
     except:
         input("Error")
