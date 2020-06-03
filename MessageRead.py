@@ -1,6 +1,6 @@
 import poplib, json, queue, time, mail_sender
 from config import data, kwd, save_json
-from re import sub, search, compile
+from re import sub, search, compile, findall
 from email.parser import Parser
 from email.utils import parseaddr
 from email.header import decode_header
@@ -10,7 +10,7 @@ from slog import logger
 ############################## 功能介绍 ##########################
 
 # 这个类自带了日志功能，会记录下所有的错误
-# 有[1:精确查找  2:模糊查找  3:联合+精确查找  4:联合+模糊查找]的功能 (联合查找用++分隔)
+# 有[1:精确查找  2:模糊查找  3:联合+精确查找  4:联合+模糊查找]的功能 (联合查找用++分隔追加条件，用(-你的条件-)的格式写你要减掉的条件并放在最后(不需要用空格隔开))
 # 注意!模糊查找的速度会变慢！
 
 ################################  在其他文件里使用这个函数的例子  ####################################
@@ -187,7 +187,7 @@ class ReadMessage:
         
         # 省略2个以内字符的模糊查找
         # pt1 = compile('.{1}')
-        # new1 = '.{0,2}'.join(pt1.findall(word))
+        # new1 = '[^' '].{0,2}'.join(pt1.findall(word))
         # co_in.append(search(new1, self.search))
         
         # 打错2个或省略1个字符的模糊查找
@@ -200,11 +200,12 @@ class ReadMessage:
                 
         for i in range(1,len(new_ls)-1):
             ch = new_ls[i]
-            new_ls[i] = '.{0,2}'
+            new_ls[i] = "[^' '.]{0,2}"
             new2.append(''.join(new_ls))
             new_ls[i] = ch
         for i in new2:
             if search(i, self.search) != None:
+                # print("匹配词为：%s;  匹配项为：%s" % (word, i)) ### 调试用语句
                 co_in.append(True)
         
         # 若有匹配项目,则返回真
@@ -226,12 +227,26 @@ class ReadMessage:
         # 联合+精确查找
         elif self.data["mode"] == 3:
             try:
-                w_ls = word.split("++")
+                try:
+                    w_pls = word.split("(")[0]
+                    w_pls = w_pls.split("++")
+                except:
+                    w_pls = word.split("++")
+                try:
+                    pattern = compile("[(].+?[)]")
+                    w_sls = pattern.findall(word)
+                    for i in range(len(w_sls)):
+                        w_sls[i] = w_sls[i].replace("(","")
+                        w_sls[i] = w_sls[i].replace(")","")
+                except:
+                    pass
             except:
-                w_ls = word
+                w_pls = word
             co_in = []
-            for i in w_ls:
+            for i in w_pls:
                 co_in.append(i in self.search)
+            for i in w_sls:
+                co_in.append(not i in self.search)
             if False in co_in:
                 return False
             else:
@@ -240,13 +255,28 @@ class ReadMessage:
         # 联合+模糊查找
         else:
             try:
-                w_ls = word.split("++")
+                try:
+                    w_pls = word.split("(")[0]
+                    w_pls = w_pls.split("++")
+                except:
+                    w_pls = word.split("++")
+                try:
+                    pattern = compile("[(].+?[)]")
+                    w_sls = pattern.findall(word)
+                    for i in range(len(w_sls)):
+                        w_sls[i] = w_sls[i].replace("(","")
+                        w_sls[i] = w_sls[i].replace(")","")
+                except:
+                    pass
             except:
-                w_ls = word
+                w_pls = word
             co_in = []
-            for i in w_ls:
+            for i in w_pls:
                 co_in.append(self.fuzzy_search(i))
+            for i in w_sls:
+                co_in.append(not self.fuzzy_search(i))
             if False in co_in:
+                # print("一票否决")
                 return False
             else:
                 return True
@@ -266,9 +296,10 @@ class ReadMessage:
                 print(newMail)
                 self.download(server, newMail)
                 for i in kwd:
-                    if self.search_wd(i) and ((self.title, self.Content) not in self.mail_queue): # 若文本或标题出现关键词，将内容放入待发送队列
+                    if self.search_wd(i) and (not (self.title, self.Content) in self.mail_queue): # 若文本或标题出现关键词，将内容放入待发送队列
                         print("%s's mail should be sent. Subject: %s"%(newMail, self.title))
                         self.mail_queue.append((self.title, self.Content))
+                        break
                 self.clean() # 每次读完一封邮件就把内容和标题清掉
                 isEmpty = self.newMail.empty()
                 
@@ -291,6 +322,13 @@ class ReadMessage:
                     break
                 time.sleep(10) # todo: 读取邮件出错，尝试重复读取的时间间隔
         
+        # 打印出匹配到的第一则邮件
+        print("\n\t%s  下面是会被发送的邮件：  %s\n" % ("**"*10, "**"*10))
+        if self.mail_queue == []:
+            print("\tNone")
+        for i in self.mail_queue:
+            print(i[0])
+        print("\n\t%s"% "***"*15)
         # 返回一个待发送邮件列表
         return self.mail_queue      
 
@@ -313,9 +351,12 @@ if __name__ == "__main__":
         content_lst = r.read()
         
         # 打印出匹配到的第一则邮件
-        print(content_lst[0][1])
+        print("\n\t%s  下面是会被发送的邮件：  %s\n" % ("**"*10, "**"*10))
+        for i in content_lst:
+            print(i[0])
+        input()
     except:
-        print("Error")
+        input("Error")
         
     
 
